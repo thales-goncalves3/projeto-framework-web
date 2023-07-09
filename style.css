@@ -1,0 +1,77 @@
+body {
+    background-color: #8a4de8;
+    font-family: 'Roboto', sans-serif;
+}
+
+.container {
+    width: 300px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.container h2 {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.container form div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.container form label {
+    margin-bottom: 8px;
+}
+
+.container form input {
+    width: 95%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f2f2f2;
+}
+
+.container form .input-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.container form .input-wrapper input {
+    width: 100%;
+}
+
+.container form button,
+.container .register-button,
+button[type="submit"],
+.login-button {
+    margin-top: 16px;
+    background-color: #8a4de8;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.container form button:hover,
+.container .register-button:hover,
+button[type="submit"]:hover,
+.login-button:hover {
+    background-color: #642eaf;
+}
+
+.container .button-wrapper {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+}

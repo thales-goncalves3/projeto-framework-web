@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FindSquad</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+
+<body>
+    <div id="app"></div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAr_yIp92mmpkHX7zNLP5WUTkx14eA2AkU",
+            authDomain: "framework-projeto.firebaseapp.com",
+            projectId: "framework-projeto",
+            storageBucket: "framework-projeto.appspot.com",
+            messagingSenderId: "993763304196",
+            appId: "1:993763304196:web:7834f07f8a600f72742651",
+            measurementId: "G-97PCHY8ZPC"
+        };;
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    email: '',
+                    password: ''
+                };
+            },
+            methods: {
+                login() {
+                    auth.signInWithEmailAndPassword(this.email, this.password)
+                        .then(() => {
+
+                            window.location.href = 'homepage.html';
+                        })
+                        .catch((error) => {
+
+                            var errorCode = error.code;
+                            var errorMessage = error.message;
+                            alert(errorMessage);
+                        });
+
+                },
+                goToRegister() {
+                    window.location.href = 'cadastro.html';
+
+                }
+            },
+            template: `
+    <div class="container">
+      <h2>Login</h2>
+      <form @submit.prevent="login">
+        <div>
+          <label for="email">Email:</label>
+          <input type="email" id="email" v-model="email" required>
+        </div>
+        <div>
+          <label for="password">Senha:</label>
+          <input type="password" id="password" v-model="password" required>
+        </div>
+        <div class="button-wrapper">
+  <button type="submit">Login</button>
+  <button class="register-button" @click="goToRegister">Registrar</button>
+</div>
+      </form>
+     
+    </div>
+  `
+        });
+
+    </script>
+</body>
+
+</html>

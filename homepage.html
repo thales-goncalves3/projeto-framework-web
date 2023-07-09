@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FindSquad</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <link rel="stylesheet" href="homepage.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="container">
+            <nav>
+                <div class="nav-item logo-div">
+                    <img src="findSquadLogo.png" alt="" class="image-logo">
+                    <h1>FindSquad</h1>
+                </div>
+                <div class="nav-item">
+                    <input type="text" v-model="pesquisa" placeholder="Pesquisar Jogo">
+                </div>
+                <div class="nav-item">
+                    <div class="nav-buttons">
+                        <button>Criar Partida</button>
+                        <button @click="goToPerfilpage">Editar Perfil</button>
+                    </div>
+                    <img src="" alt="">
+                </div>
+            </nav>
+            <main>
+                <aside>
+                    <h1>Partidas criadas</h1>
+                    <div>asdasd</div>
+                    <div>asdasd</div>
+                    <div>asdasd</div>
+                    <div>asdasd</div>
+                    <div>asdasd</div>
+                    <div>asdasd</div>
+                    <div>asdasd</div>
+                </aside>
+                <section>
+                    <div class="image-grid">
+                        <div class="image-item" v-for="image in pesquisarJogo" :key="image.id">
+                            <img :src="image.url" :alt="image.name" class="grid-image">
+
+                            <div class="button-wrapper">
+                                <button class="find-match-button">Achar Partida</button>
+                                <button class="create-group-button">Criar Grupo</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <aside>
+                    <h1>TEste</h1>
+                </aside>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAr_yIp92mmpkHX7zNLP5WUTkx14eA2AkU",
+            authDomain: "framework-projeto.firebaseapp.com",
+            projectId: "framework-projeto",
+            storageBucket: "framework-projeto.appspot.com",
+            messagingSenderId: "993763304196",
+            appId: "1:993763304196:web:7834f07f8a600f72742651",
+            measurementId: "G-97PCHY8ZPC"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const storage = firebase.storage();
+
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    images: [],
+                    pesquisa: ''
+                };
+            },
+            mounted() {
+                this.loadImages();
+            },
+            computed:{
+                pesquisarJogo(){
+                    return this.images.filter(image =>{
+                        return image.name.toLowerCase().includes(this.pesquisa);
+                    })
+                }
+            },
+            methods: {
+                loadImages() {
+                    const storageRef = storage.ref();
+
+                    storageRef.listAll()
+                        .then((res) => {
+
+                            const imagePromises = res.items.map((item) =>
+                                item.getDownloadURL()
+                                    .then((url) => {
+                                        return {
+                                            name: item.name,
+                                            url: url
+                                        };
+                                    })
+                            );
+
+
+                            Promise.all(imagePromises)
+                                .then((images) => {
+                                    this.images = images;
+                                })
+                                .catch((error) => {
+                                    console.error('Erro ao obter URLs das imagens:', error);
+                                });
+
+                        })
+                        .catch((error) => {
+
+                            console.error('Erro ao listar imagens:', error);
+                        });
+                },
+
+                goToPerfilpage(){
+                    window.location.href = 'perfil.html';
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

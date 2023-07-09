@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <title>Perfil</title>
+</head>
+
+<body>
+    <div id="app">
+        <h1>{{usuario}}</h1>
+        <h1>{{email}}</h1>
+        <input type="file" @change="imageSelected">
+        <button @click="uploadPhoto">Upload</button>
+        <img :src="photoUrl" alt="Foto de Perfil" width="200">
+    </div>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAr_yIp92mmpkHX7zNLP5WUTkx14eA2AkU",
+            authDomain: "framework-projeto.firebaseapp.com",
+            projectId: "framework-projeto",
+            storageBucket: "framework-projeto.appspot.com",
+            messagingSenderId: "993763304196",
+            appId: "1:993763304196:web:7834f07f8a600f72742651",
+            measurementId: "G-97PCHY8ZPC"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        new Vue({
+            el: "#app",
+            data() {
+                return {
+                    usuario: '',
+                    email: '',
+                    photoUrl: ''
+                }
+            },
+            mounted() {
+                auth.onAuthStateChanged((user) => {
+                    console.log(user);
+                    if (user) {
+                        const userRef = db.collection("users").doc(user.uid);
+                        userRef.get().then((doc) => {
+                            if (doc.exists) {
+
+                                this.usuario = doc.data().username;
+                                this.email = doc.data().email;
+                                const photoPath = `users/${user.uid}/profilePhoto.jpg`;
+                                const photoRef = storage.ref().child(photoPath);
+                                photoRef.getDownloadURL().then((url) => {
+                                    this.photoUrl = url;
+                                });
+                            }
+                        });
+                    } else {
+                        console.log(' n tem usuario');
+                    }
+                });
+            },
+            methods: {
+                imageSelected(event) {
+                    this.selectedFile = event.target.files[0];
+                },
+                uploadPhoto() {
+                    if (!this.selectedFile) {
+                        alert("Selecione um arquivo antes de fazer o upload.");
+                        return;
+                    }
+
+                    const user = auth.currentUser;
+                    const uid = user.uid;
+                    const fileRef = storage.ref().child(`users/${uid}/profilePhoto.jpg`);
+
+                    fileRef.put(this.selectedFile)
+                        .then(() => {
+                            return fileRef.getDownloadURL();
+                        })
+                        .then((url) => {
+
+                            const userRef = db.collection("users").doc(uid);
+                            return userRef.update({
+                                photoUrl: url
+                            });
+                        })
+                        .then(() => {
+                            alert("Foto de perfil atualizada com sucesso.");
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                            alert("Ocorreu um erro ao fazer o upload da foto de perfil.");
+                        });
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

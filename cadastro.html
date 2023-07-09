@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tela de Cadastro</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAr_yIp92mmpkHX7zNLP5WUTkx14eA2AkU",
+            authDomain: "framework-projeto.firebaseapp.com",
+            projectId: "framework-projeto",
+            storageBucket: "framework-projeto.appspot.com",
+            messagingSenderId: "993763304196",
+            appId: "1:993763304196:web:7834f07f8a600f72742651",
+            measurementId: "G-97PCHY8ZPC"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    username: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: '',
+                    show: false
+                };
+            },
+            methods: {
+
+                register() {
+                    if (this.password !== this.confirmPassword) {
+                        alert('As senhas não coincidem. Por favor, tente novamente.');
+                        return;
+                    }
+
+                    auth.createUserWithEmailAndPassword(this.email, this.password)
+                        .then(() => {
+                            var user = auth.currentUser;
+                            var uid = user.uid;
+
+                            var db = firebase.firestore();
+                            db.collection("users").doc(uid).set({
+                                email: this.email,
+                                username: this.username,
+                                uuid: uid
+                            })
+                                .then(() => {
+                                    window.location.href = 'index.html';
+                                    alert("Usuário criado");
+                                })
+                                .catch((error) => {
+                                    var error_code = error.code;
+                                    var error_message = error.message;
+                                    alert(error_message);
+                                });
+
+                        })
+                        .catch((error) => {
+                            var error_code = error.code;
+                            var error_message = error.message;
+                            alert(error_message);
+                        });
+                }
+
+            },
+            template: `
+            <div class="container" v-if="!show">
+                <h2>Cadastro</h2>
+                <form @submit.prevent="register">
+                    <div>
+                        <label for="username">Usuário:</label>
+                        <input type="text" id="username" v-model="username" required>
+                    </div>
+                    <div>
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" v-model="email" required>
+                    </div>
+                    <div>
+                        <label for="password">Senha:</label>
+                        <input type="password" id="password" v-model="password" required>
+                    </div>
+                    <div>
+                        <label for="confirm-password">Confirmar Senha:</label>
+                        <input type="password" id="confirm-password" v-model="confirmPassword" required>
+                    </div>
+                    <button type="submit">Cadastrar</button>
+                    <button class="login-button" onclick="window.location.href = 'index.html'">Login</button>
+                </form>
+            </div>
+            <div class="container" v-else>
+                <h1>Usuário criado com sucesso!</h1>
+                <button class="login-button" onclick="window.location.href = 'index.html'">Login</button>
+            </div>
+            `
+        });
+    </script>
+</body>
+
+</html>
