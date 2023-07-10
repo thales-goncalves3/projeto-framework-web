@@ -15,6 +15,13 @@
 <body>
     <div id="app">
         <h1>{{usuario}}</h1>
+        <div v-if="!inputUsuario">
+            <button @click="showInput">Alterar Usuario</button>
+        </div>
+        <div v-else>
+            <input type="text" name="" id="" v-model="novoUsuario">
+            <button @click="alterarUsuario">Alterar</button>
+        </div>
         <h1>{{email}}</h1>
         <input type="file" @change="imageSelected">
         <button @click="uploadPhoto">Upload</button>
@@ -42,7 +49,9 @@
                 return {
                     usuario: '',
                     email: '',
-                    photoUrl: ''
+                    photoUrl: '',
+                    inputUsuario: false,
+                    novoUsuario: '',
                 }
             },
             mounted() {
@@ -68,8 +77,20 @@
                 });
             },
             methods: {
+                showInput(){
+                    this.inputUsuario = true;
+                },
                 imageSelected(event) {
                     this.selectedFile = event.target.files[0];
+                },
+                alterarUsuario(){
+                    db.collection("users").doc(auth.currentUser.uid).update({
+                        username: this.novoUsuario,
+                    }).then(()=>{
+                        console.log("deu certo");
+                    }).catch(()=>{
+                        console.log("nao deu");
+                    })
                 },
                 uploadPhoto() {
                     if (!this.selectedFile) {
@@ -99,7 +120,8 @@
                             console.log(error);
                             alert("Ocorreu um erro ao fazer o upload da foto de perfil.");
                         });
-                }
+                },
+            
             }
         })
     </script>

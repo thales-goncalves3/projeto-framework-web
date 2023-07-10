@@ -25,22 +25,21 @@
                 </div>
                 <div class="nav-item">
                     <div class="nav-buttons">
-                        <button>Criar Partida</button>
+                        <button @click="goToMatchPage">Criar Partida</button>
                         <button @click="goToPerfilpage">Editar Perfil</button>
+                        <button @click="goToLoginPage">Sair</button>
                     </div>
                     <img src="" alt="">
                 </div>
             </nav>
+
             <main>
                 <aside>
-                    <h1>Partidas criadas</h1>
-                    <div>asdasd</div>
-                    <div>asdasd</div>
-                    <div>asdasd</div>
-                    <div>asdasd</div>
-                    <div>asdasd</div>
-                    <div>asdasd</div>
-                    <div>asdasd</div>
+                    <div v-for="(partida,id) in partidas" :key="id">
+                        <h3>{{ partida.gameName }}</h3>
+                        <p>Criador: {{ partida.creatorUsername }}</p>
+                        <p>Jogadores: {{ partida.players }}</p>
+                    </div>
                 </aside>
                 <section>
                     <div class="image-grid">
@@ -54,13 +53,10 @@
                         </div>
                     </div>
                 </section>
-                <aside>
-                    <h1>TEste</h1>
-                </aside>
             </main>
         </div>
     </div>
-
+    <script src="./app-bar.vue"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyAr_yIp92mmpkHX7zNLP5WUTkx14eA2AkU",
@@ -74,21 +70,26 @@
 
         firebase.initializeApp(firebaseConfig);
         const storage = firebase.storage();
+        const db = firebase.firestore();
+        const auth= firebase.auth();
 
         new Vue({
             el: '#app',
+
             data() {
                 return {
                     images: [],
-                    pesquisa: ''
+                    pesquisa: '',
+                    partidas: {}
                 };
             },
             mounted() {
                 this.loadImages();
+                this.carregarPartidas();
             },
-            computed:{
-                pesquisarJogo(){
-                    return this.images.filter(image =>{
+            computed: {
+                pesquisarJogo() {
+                    return this.images.filter(image => {
                         return image.name.toLowerCase().includes(this.pesquisa);
                     })
                 }
@@ -125,8 +126,71 @@
                             console.error('Erro ao listar imagens:', error);
                         });
                 },
+                goToLoginPage() {
+                    auth.signOut().then(() => {
+                        window.location.href = 'index.html';
+                    }).catch(error => {
+                        console.error("Erro ao fazer logout:", error);
+                    });
+                },
+                getUsername(uid) {
+                    const db = firebase.firestore();
+                    return db
+                        .collection("users")
+                        .doc(uid)
+                        .get()
+                        .then(doc => {
+                            if (doc.exists) {
+                                return doc.data().username;
+                            } else {
+                                return "Usuário não encontrado";
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erro ao buscar usuário:", error);
+                        });
+                },
+                goToMatchPage() {
+                    window.location.href = 'partida.html';
+                },
 
-                goToPerfilpage(){
+                carregarPartidas() {
+                    const db = firebase.firestore();
+                    db.collection("matches")
+                        .get()
+                        .then(querySnapshot => {
+                            querySnapshot.forEach(async doc => {
+                                const partida = doc.data();
+                                partida.creatorUsername = await this.getUsername(partida.creator);
+                                partida.gameName = await this.getGame(partida.game);
+                                this.partidas[doc.id] = partida;
+                            });
+
+                            console.log(this.partidas);
+                        })
+                        .catch(error => {
+                            console.error("Erro ao carregar as partidas:", error);
+                        });
+                },
+
+                getGame(gameId) {
+                    return db
+                        .collection("games")
+                        .doc(gameId)
+                        .get()
+                        .then(doc => {
+                            if (doc.exists) {
+                                return doc.data().game;
+                            } else {
+                                return "Jogo não encontrado";
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erro ao buscar jogo:", error);
+                        });
+                },
+
+                goToPerfilpage() {
                     window.location.href = 'perfil.html';
                 }
             }

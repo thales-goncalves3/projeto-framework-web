@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar partida</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <link rel="stylesheet" href="homepage.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div v-if="!show">
+            <form @submit.prevent="criarPartida">
+                <div>
+                    <div v-for="game in games" :key="game.id">
+                        <input type="radio" :id="game.id" :value="game.id" v-model="selectedGame">
+                        <label :for="game.id">{{ game.game }}</label>
+                    </div>
+                    <label for="numPlayers">Jogadores necessários</label>
+                    <select id="numPlayers" v-model="selectedNumPlayers">
+                        <option value="1">1 jogador</option>
+                        <option value="2">2 jogadores</option>
+                        <option value="3">3 jogadores</option>
+                        <option value="4">4 jogadores</option>
+                    </select>
+                </div>
+                <button type="submit">Criar Partida</button>
+            </form>
+        </div>
+        <div v-else>
+            <p>Partida Criada com sucesso</p>
+            <button @click="voltarHomepage">Voltar para página principal</button>
+        </div>
+    </div>
+</body>
+<script>
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAr_yIp92mmpkHX7zNLP5WUTkx14eA2AkU",
+        authDomain: "framework-projeto.firebaseapp.com",
+        projectId: "framework-projeto",
+        storageBucket: "framework-projeto.appspot.com",
+        messagingSenderId: "993763304196",
+        appId: "1:993763304196:web:7834f07f8a600f72742651",
+        measurementId: "G-97PCHY8ZPC"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    new Vue({
+        el: "#app",
+        data() {
+            return {
+                games: [],
+                selectedGame: '',
+                selectedNumPlayers: '1',
+                show: false,
+            };
+        },
+        mounted() {
+            this.carregarGames();
+        },
+        methods: {
+            carregarGames() {
+                const db = firebase.firestore();
+                db.collection("games")
+                    .get()
+                    .then(querySnapshot => {
+                        querySnapshot.forEach(doc => {
+                            this.games.push({
+                                id: doc.id,
+                                game: doc.data().game
+                            });
+                        });
+
+                        console.log(this.games);
+                    })
+                    .catch(error => {
+                        console.error("Erro ao carregar os jogos:", error);
+                    });
+            },
+            criarPartida() {
+                const auth = firebase.auth();
+                const db = firebase.firestore();
+                const currentUser = auth.currentUser;
+
+
+                db.collection("matches")
+                    .doc()
+                    .set({
+                        game: this.selectedGame,
+                        creator: currentUser.uid,
+                        players: this.selectedNumPlayers
+                    })
+                    .then(() => {
+                        console.log("certo");
+                        this.show = !this.show;
+                    })
+                    .catch(error => {
+                        console.error("erro", error);
+                    });
+            },
+            voltarHomepage() {
+                window.location.href = 'homepage.html';
+            }
+        }
+    })
+</script>
+
+</html>
