@@ -9,75 +9,19 @@ body {
     background-color: #8a4de8;
 }
 
-
-nav {
-    height: 100px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 1%;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-}
-
-aside {
-    width: 20%;
-    border: 1px solid black;
+.container {
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
-    align-items: center;
-    height: 100%;
+    justify-content: center;
 }
 
 main {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-section{
-    width: 60%;
-    background-color: #6317d41e;
-    border-radius: 10px;
-}
-
-.nav-item {
-    width: 33%;
-    height: 100%;
-    display: flex;
     justify-content: center;
     align-items: center;
+    align-content: center;
 }
 
-.nav-buttons {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.nav-buttons button {
-    padding: 10px;
-    border-radius: 10px;
-    margin: 2%;
-    height: 50px;
-    cursor: pointer;
-    width: 40%;
-}
-
-.nav-item h1 {
-    margin-right: 50px;
-}
-
-.nav-item input {
-    height: 50%;
-    width: 100%;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 16px;
-}
 
 .image-logo {
     width: 80px;
@@ -89,12 +33,6 @@ section{
     display: flex;
     justify-content: space-around;
     align-items: center;
-}
-
-.container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
 }
 
 .image-grid {
@@ -141,4 +79,52 @@ section{
 .find-match-button:hover,
 .create-group-button:hover {
     background-color: #e0e0e0;
+}
+
+.partida-card {
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.partida-card h3 {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0 0 10px;
+}
+
+.partida-card p {
+    margin: 0 0 5px;
+}
+
+.pesquisa-input {
+    width: 500px;
+    height: 50px;
+    border-radius: 10px;
+    text-align: center;
+  }
+
+.partida-card button {
+    background-color: #8a4de8;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+.partida-card button:hover {
+    background-color: #8a4de8;
+}
+
+.container-card {
+    display: flex;
+    justify-content: center;
+    margin: 1%;
 }

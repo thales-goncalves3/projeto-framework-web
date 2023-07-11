@@ -11,32 +11,45 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <link rel="stylesheet" href="universal.css">
+    <link rel="stylesheet" href="partida.css">
+    <link rel="stylesheet" href="nav.css">
 </head>
 
 <body>
     <div id="app">
-        <div v-if="!show">
-            <form @submit.prevent="criarPartida">
-                <div>
-                    <div v-for="game in games" :key="game.id">
-                        <input type="radio" :id="game.id" :value="game.id" v-model="selectedGame">
-                        <label :for="game.id">{{ game.game }}</label>
+        <nav>
+            <div class="nav-item logo-div">
+                <img src="findSquadLogo.png" alt="" class="image-logo">
+                <h1>FindSquad</h1>
+            </div>
+            <button @click="goToHomePage" class="button-home">Home</button>
+        </nav>
+        <div class="container">
+            <div v-if="!show">
+                <form @submit.prevent="criarPartida">
+                    <div>
+                        <div v-for="game in games" :key="game.id">
+                            <input type="radio" :id="game.id" :value="game.id" v-model="selectedGame">
+                            <label :for="game.id">{{ game.game }}</label>
+                        </div>
+                        <label for="numPlayers">Jogadores necessários</label>
+                        <select id="numPlayers" v-model="selectedNumPlayers">
+                            <option value="1">1 jogador</option>
+                            <option value="2">2 jogadores</option>
+                            <option value="3">3 jogadores</option>
+                            <option value="4">4 jogadores</option>
+                        </select>
                     </div>
-                    <label for="numPlayers">Jogadores necessários</label>
-                    <select id="numPlayers" v-model="selectedNumPlayers">
-                        <option value="1">1 jogador</option>
-                        <option value="2">2 jogadores</option>
-                        <option value="3">3 jogadores</option>
-                        <option value="4">4 jogadores</option>
-                    </select>
-                </div>
-                <button type="submit">Criar Partida</button>
-            </form>
+                    <button type="submit">Criar Partida</button>
+                </form>
+            </div>
+            <div v-else>
+                <p>Partida Criada com sucesso</p>
+                <button @click="voltarHomepage">Voltar para página principal</button>
+            </div>
         </div>
-        <div v-else>
-            <p>Partida Criada com sucesso</p>
-            <button @click="voltarHomepage">Voltar para página principal</button>
-        </div>
+
     </div>
 </body>
 <script>
@@ -70,6 +83,9 @@
             this.carregarGames();
         },
         methods: {
+            goToHomePage() {
+                window.location.href = "homepage.html";
+            },
             carregarGames() {
                 const db = firebase.firestore();
                 db.collection("games")

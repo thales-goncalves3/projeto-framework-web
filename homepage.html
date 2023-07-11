@@ -10,6 +10,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <link rel="stylesheet" href="nav.css">
+    <link rel="stylesheet" href="universal.css">
 </head>
 
 <body>
@@ -20,39 +22,37 @@
                     <img src="findSquadLogo.png" alt="" class="image-logo">
                     <h1>FindSquad</h1>
                 </div>
-                <div class="nav-item">
-                    <input type="text" v-model="pesquisa" placeholder="Pesquisar Jogo">
+                <div>
+                    <input type="text" v-model="pesquisa" placeholder="Pesquisar Jogo" class="pesquisa-input">
                 </div>
                 <div class="nav-item">
                     <div class="nav-buttons">
-                        <button @click="goToMatchPage">Criar Partida</button>
-                        <button @click="goToPerfilpage">Editar Perfil</button>
+                        <div v-if="!adm">
+                            <button @click="goToMatchPage">Criar Partida</button>
+                            <button @click="goToPerfilpage">Editar Perfil</button>
+                        </div>
+                        <div v-else>
+                            <button @click="goToGamepage">Cadastrar Jogo</button>
+                        </div>
+                        <button @click="goToMatchCreatedPage">Partidas Criadas</button>
                         <button @click="goToLoginPage">Sair</button>
                     </div>
                     <img src="" alt="">
                 </div>
             </nav>
-
             <main>
-                <aside>
-                    <div v-for="(partida,id) in partidas" :key="id">
-                        <h3>{{ partida.gameName }}</h3>
-                        <p>Criador: {{ partida.creatorUsername }}</p>
-                        <p>Jogadores: {{ partida.players }}</p>
-                    </div>
-                </aside>
-                <section>
-                    <div class="image-grid">
-                        <div class="image-item" v-for="image in pesquisarJogo" :key="image.id">
-                            <img :src="image.url" :alt="image.name" class="grid-image">
 
-                            <div class="button-wrapper">
-                                <button class="find-match-button">Achar Partida</button>
-                                <button class="create-group-button">Criar Grupo</button>
-                            </div>
+                <div class="image-grid">
+                    <div class="image-item" v-for="image in pesquisarJogo" :key="image.id">
+                        <img :src="image.url" :alt="image.name" class="grid-image">
+
+                        <div class="button-wrapper">
+                            <button class="find-match-button">Achar Partida</button>
+                            <button class="create-group-button">Criar Grupo</button>
                         </div>
                     </div>
-                </section>
+                </div>
+
             </main>
         </div>
     </div>
@@ -71,21 +71,31 @@
         firebase.initializeApp(firebaseConfig);
         const storage = firebase.storage();
         const db = firebase.firestore();
-        const auth= firebase.auth();
+        const auth = firebase.auth();
 
         new Vue({
             el: '#app',
-
             data() {
                 return {
                     images: [],
                     pesquisa: '',
-                    partidas: {}
+                    partidas: {},
+                    adm: false,
                 };
             },
             mounted() {
                 this.loadImages();
-                this.carregarPartidas();
+                // this.carregarPartidas();
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        const uid = user.uid;
+                        console.log(uid);
+                        db.collection("users").doc(uid).get().then((user) => {
+                            console.log(user.data());
+                            this.adm = user.data().adm;
+                        })
+                    }
+                })
             },
             computed: {
                 pesquisarJogo() {
@@ -110,8 +120,6 @@
                                         };
                                     })
                             );
-
-
                             Promise.all(imagePromises)
                                 .then((images) => {
                                     this.images = images;
@@ -133,6 +141,9 @@
                         console.error("Erro ao fazer logout:", error);
                     });
                 },
+                goToMatchCreatedPage() {
+                    window.location.href = 'partidas_criadas.html';
+                },
                 getUsername(uid) {
                     const db = firebase.firestore();
                     return db
@@ -153,25 +164,27 @@
                 goToMatchPage() {
                     window.location.href = 'partida.html';
                 },
-
-                carregarPartidas() {
-                    const db = firebase.firestore();
-                    db.collection("matches")
-                        .get()
-                        .then(querySnapshot => {
-                            querySnapshot.forEach(async doc => {
-                                const partida = doc.data();
-                                partida.creatorUsername = await this.getUsername(partida.creator);
-                                partida.gameName = await this.getGame(partida.game);
-                                this.partidas[doc.id] = partida;
-                            });
-
-                            console.log(this.partidas);
-                        })
-                        .catch(error => {
-                            console.error("Erro ao carregar as partidas:", error);
-                        });
+                goToGamepage() {
+                    window.location.href = 'game.html';
                 },
+                // carregarPartidas() {
+                //     const db = firebase.firestore();
+                //     db.collection("matches")
+                //         .get()
+                //         .then(querySnapshot => {
+                //             querySnapshot.forEach(async doc => {
+                //                 const partida = doc.data();
+                //                 partida.creatorUsername = await this.getUsername(partida.creator);
+                //                 partida.gameName = await this.getGame(partida.game);
+                //                 this.partidas[doc.id] = partida;
+                //             });
+
+                //             // console.log(this.partidas);
+                //         })
+                //         .catch(error => {
+                //             console.error("Erro ao carregar as partidas:", error);
+                //         });
+                // },
 
                 getGame(gameId) {
                     return db

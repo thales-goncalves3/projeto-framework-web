@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <link rel="stylesheet" href="universal.css">
+    <link rel="stylesheet" href="nav.css">
+    <link rel="stylesheet" href="game.css">
+</head>
+
+<body>
+    <div id="app">
+        <nav>
+            <div class="nav-item logo-div">
+                <img src="findSquadLogo.png" alt="" class="image-logo">
+                <h1>FindSquad</h1>
+            </div>
+            <button @click="goToHomePage" class="button-home">Home</button>
+        </nav>
+
+        <div class="container">
+            <div v-if="!jogoCadastrado">
+                <h2>Cadastrar Jogo</h2>
+                <form @submit.prevent="criarJogo" class="form">
+                    <div class="form-group">
+                        <label for="name">Nome:</label>
+                        <input type="text" id="name" v-model="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Gênero:</label>
+                        <input type="text" id="gender" v-model="gender">
+                    </div>
+                    <button type="submit">Criar Jogo</button>
+                </form>
+            </div>
+            <div v-else>
+                <h2>Jogo cadastrado com sucesso</h2>
+                <button @click="jogoCadastrado = false" class="button-cadastrar">Cadastrar novo jogo</button>
+            </div>
+        </div>
+
+    </div>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAr_yIp92mmpkHX7zNLP5WUTkx14eA2AkU",
+            authDomain: "framework-projeto.firebaseapp.com",
+            projectId: "framework-projeto",
+            storageBucket: "framework-projeto.appspot.com",
+            messagingSenderId: "993763304196",
+            appId: "1:993763304196:web:7834f07f8a600f72742651",
+            measurementId: "G-97PCHY8ZPC"
+        };;
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        new Vue({
+            el: "#app",
+            data() {
+                return {
+                    name: '',
+                    gender: '',
+                    jogoCadastrado: false,
+                };
+            },
+            methods: {
+                goToHomePage() {
+                    window.location.href = "homepage.html";
+                },
+                criarJogo() {
+
+                    db.collection("games").doc().set({
+                        game: this.name,
+                        gender: this.gender,
+                    }).then(() => {
+                        this.jogoCadastrado = !this.jogoCadastrado;
+                    })
+                },
+
+            }
+        })
+    </script>
+</body>
+
+</html>

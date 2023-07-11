@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partidas Criadas</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <link rel="stylesheet" href="universal.css">
+    <link rel="stylesheet" href="nav.css">
+    <link rel="stylesheet" href="homepage.css">
+</head>
+
+<body>
+    <div id="app">
+        <nav>
+            <div class="nav-item logo-div">
+                <img src="findSquadLogo.png" alt="" class="image-logo">
+                <h1>FindSquad</h1>
+            </div>
+            <button @click="goToHomePage" class="button-home">Home</button>
+        </nav>
+
+
+        <div v-for="partida in partidas" class="container-card">
+            <div class="partida-card">
+                <h3>{{ partida.gameName }}</h3>
+                <p>Criador: {{ partida.creatorUsername }}</p>
+                <p>Jogadores: {{ partida.players }}</p>
+                <button>Entrar na Partida</button>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAr_yIp92mmpkHX7zNLP5WUTkx14eA2AkU",
+            authDomain: "framework-projeto.firebaseapp.com",
+            projectId: "framework-projeto",
+            storageBucket: "framework-projeto.appspot.com",
+            messagingSenderId: "993763304196",
+            appId: "1:993763304196:web:7834f07f8a600f72742651",
+            measurementId: "G-97PCHY8ZPC"
+        };;
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        new Vue({
+            el: '#app',
+            data() {
+                return {
+                    partidas: [],
+                }
+            },
+            mounted() {
+                this.carregarPartidas();
+            },
+            methods: {
+                carregarPartidas() {
+                    db.collection("matches")
+                        .get()
+                        .then(querySnapshot => {
+                            const query = querySnapshot.forEach(async doc => {
+                                const partida = doc.data();
+                                partida.creatorUsername = await this.getUsername(partida.creator);
+                                partida.gameName = await this.getGame(partida.game);
+                                this.partidas.push(partida);
+                            });
+
+                            console.log(this.partidas);
+                        })
+                        .catch(error => {
+                            console.error("Erro ao carregar as partidas:", error);
+                        });
+
+                },
+                getUsername(uid) {
+                    const db = firebase.firestore();
+                    return db
+                        .collection("users")
+                        .doc(uid)
+                        .get()
+                        .then(doc => {
+                            if (doc.exists) {
+                                return doc.data().username;
+                            } else {
+                                return "Usuário não encontrado";
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erro ao buscar usuário:", error);
+                        });
+                },
+                getGame(gameId) {
+                    return db
+                        .collection("games")
+                        .doc(gameId)
+                        .get()
+                        .then(doc => {
+                            if (doc.exists) {
+                                return doc.data().game;
+                            } else {
+                                return "Jogo não encontrado";
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erro ao buscar jogo:", error);
+                        });
+                },
+                goToHomePage() {
+                    window.location.href = "homepage.html";
+                }
+            }
+        })
+    </script>
+
+    <style scoped>
+        nav {
+            display: flex;
+        }
+    </style>
+</body>

@@ -9,23 +9,53 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <link rel="stylesheet" href="nav.css">
     <title>Perfil</title>
+    <link rel="stylesheet" href="universal.css">
+    <link rel="stylesheet" href="perfil.css">
 </head>
 
 <body>
     <div id="app">
-        <h1>{{usuario}}</h1>
-        <div v-if="!inputUsuario">
-            <button @click="showInput">Alterar Usuario</button>
-        </div>
-        <div v-else>
-            <input type="text" name="" id="" v-model="novoUsuario">
-            <button @click="alterarUsuario">Alterar</button>
-        </div>
-        <h1>{{email}}</h1>
-        <input type="file" @change="imageSelected">
-        <button @click="uploadPhoto">Upload</button>
-        <img :src="photoUrl" alt="Foto de Perfil" width="200">
+        <nav>
+            <div class="nav-item logo-div">
+                <img src="findSquadLogo.png" alt="" class="image-logo">
+                <h1>FindSquad</h1>
+            </div>
+            <button @click="goToHomePage" class="button-home">Home</button>
+        </nav>
+        <div class="container">
+            <div class="content">
+              <div class="section">
+                <label>Usuário:</label>
+                <h1>{{usuario}}</h1>
+              </div>
+              <div class="section">
+                <label>Email:</label>
+                <h1>{{email}}</h1>
+              </div>
+              <div class="section">
+                <label>Alterar Usuário:</label>
+                <div v-if="!inputUsuario">
+                  <button @click="showInput">Alterar</button>
+                </div>
+                <div v-else>
+                  <input type="text" name="" id="" v-model="novoUsuario">
+                  <button @click="alterarUsuario">Salvar</button>
+                </div>
+              </div>
+              <div class="section">
+                <label>Upload de Foto:</label>
+                <input type="file" @change="imageSelected">
+                <button @click="uploadPhoto">Upload</button>
+              </div>
+              <div class="section">
+                <label>Foto de Perfil:</label>
+                <img :src="photoUrl" alt="Foto de Perfil" width="200">
+              </div>
+            </div>
+          </div>
+          
     </div>
     <script>
         const firebaseConfig = {
@@ -72,11 +102,14 @@
                             }
                         });
                     } else {
-                        console.log(' n tem usuario');
+                        console.log('n tem usuario');
                     }
                 });
             },
             methods: {
+                goToHomePage(){
+                    window.location.href = "homepage.html"
+                },
                 showInput(){
                     this.inputUsuario = true;
                 },
